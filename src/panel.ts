@@ -73,14 +73,17 @@ export class PanelModelBase extends Base implements IConditionRunner, ILocalizab
     public visibleIf: string = "";
     rowsChangedCallback: () => void;
     private locTitleValue: LocalizableString;
+    private locBodyValue: LocalizableString;
     public visibleIndex: number = -1;
     private visibleValue: boolean = true;
     constructor(public name: string = "") {
         super();
         this.idValue = PanelModelBase.getPanelId();
         this.locTitleValue = new LocalizableString(this, true);
+        this.locBodyValue = new LocalizableString(this, true);
         var self = this;
         this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.getRendredTitle(text); };
+        this.locBodyValue.onRenderedHtmlCallback = function(text) { return self.getRenderedBody(text); };
         this.elementsValue.push = function (value): number { return self.doOnPushElement(this, value); };
         this.elementsValue.splice = function (start?: number, deleteCount?: number, ...items: QuestionBase[]): QuestionBase[] {
             return self.doSpliceElements(this, start, deleteCount, ...items);
@@ -99,6 +102,11 @@ export class PanelModelBase extends Base implements IConditionRunner, ILocalizab
         this.locTitle.text = newValue;
     }
     public get locTitle(): LocalizableString { return this.locTitleValue; }
+    public get body(): string { return this.locBody.text; }
+    public set body(newValue: string) {
+        this.locBody.text = newValue;
+    }
+    public get locBody(): LocalizableString { return this.locBodyValue; }
     public getLocale(): string { return this.data ? (<ILocalizableOwner><any>this.data).getLocale() : ""; }
     public getMarkdownHtml(text: string)  { return this.data ? (<ILocalizableOwner><any>this.data).getMarkdownHtml(text) : null; }
 
@@ -286,7 +294,14 @@ export class PanelModelBase extends Base implements IConditionRunner, ILocalizab
     public get processedTitle() {
         return this.getRendredTitle(this.locTitle.textOrHtml);
     }
+    public get processedBody() {
+        return this.getRenderedBody(this.locTitle.textOrHtml);
+    }
     protected getRendredTitle(str: string): string {
+        if(!str && this.isPanel && this.isDesignMode) return "[" + this.name + "]";
+        return this.data != null ? this.data.processText(str) : str;
+    }
+    protected getRenderedBody(str: string): string {
         if(!str && this.isPanel && this.isDesignMode) return "[" + this.name + "]";
         return this.data != null ? this.data.processText(str) : str;
     }
@@ -364,11 +379,12 @@ export class PanelModelBase extends Base implements IConditionRunner, ILocalizab
             this.elements[i].onLocaleChanged()
         }
         this.locTitle.onChanged();
+        this.locBody.onChanged();
     }
 }
 
 /**
- * A container element, similar to the Page objects. However, unlike the Page, Panel can't be a root. 
+ * A container element, similar to the Page objects. However, unlike the Page, Panel can't be a root.
  * It may contain questions and other panels.
  */
 export class PanelModel extends PanelModelBase implements IElement {
@@ -418,5 +434,6 @@ export class PanelModel extends PanelModelBase implements IElement {
 }
 
 JsonObject.metaData.addClass("panel", ["name",  { name: "elements", alternativeName: "questions", baseClassName: "question", visible: false },
-    { name: "startWithNewLine:boolean", default: true}, { name: "visible:boolean", default: true }, "visibleIf:expression", 
-    { name: "title:text", serializationProperty: "locTitle" }, {name: "innerIndent:number", default: 0, choices: [0, 1, 2, 3]}], function () { return new PanelModel(); });
+    { name: "startWithNewLine:boolean", default: true}, { name: "visible:boolean", default: true }, "visibleIf:expression",
+    { name: "title:text", serializationProperty: "locTitle" }, { name: "body:text", serializationProperty: "locBody" },
+    {name: "innerIndent:number", default: 0, choices: [0, 1, 2, 3]}], function () { return new PanelModel(); });

@@ -58,6 +58,7 @@ export class QuestionBase extends Base implements IQuestion, IConditionRunner, I
     public hasErrors(fireCallback: boolean = true): boolean { return false; }
     public get currentErrorCount(): number { return 0; }
     public get hasTitle(): boolean { return false; }
+    public get hasBody(): boolean { return false; }
     public get hasInput(): boolean { return false; }
     public get hasComment(): boolean { return false; }
     public get id(): string { return this.idValue; }

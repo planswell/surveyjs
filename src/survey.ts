@@ -60,6 +60,10 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      */
     public showTitle: boolean = true;
     /**
+     * Set it to false hide survey body.
+     */
+    public showBody: boolean = true;
+    /**
      * Set it to false to hide page titles.
      * @see PageModel.title
      */
@@ -89,7 +93,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public storeOthersAsComment: boolean = true;
     /**
      * Set it true if you want to go to the next page without pressing 'Next' button when all questions are anwered.
-    * @see showNavigationButtons 
+    * @see showNavigationButtons
      */
     public goNextPageAutomatic: boolean = false;
     /**
@@ -111,11 +115,13 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public clearInvisibleValues: boolean = false;
 
     private locTitleValue : LocalizableString;
+    private locBodyValue : LocalizableString;
     private locCompletedHtmlValue : LocalizableString;
     private locPagePrevTextValue : LocalizableString;
     private locPageNextTextValue : LocalizableString;
     private locCompleteTextValue : LocalizableString;
     private locQuestionTitleTemplateValue: LocalizableString;
+    private locQuestionBodyTemplateValue: LocalizableString;
 
     private currentPageValue: PageModel = null;
     private valuesHash: HashTable<any> = {};
@@ -126,6 +132,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     private showPageNumbersValue: boolean = false;
     private showQuestionNumbersValue: string = "on";
     private questionTitleLocationValue: string = "top";
+    private questionBodyLocationValue: string = "top";
     private localeValue: string = "";
     private isCompleted: boolean = false;
     private isLoading: boolean = false;
@@ -208,7 +215,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      */
     public onProcessHtml: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     /**
-     * Use this event to process the markdown text. 
+     * Use this event to process the markdown text.
      */
     public onTextMarkdown: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     /**
@@ -258,12 +265,14 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         var self = this;
         this.locTitleValue = new LocalizableString(this, true);
         this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.processedTitle; };
+        this.locBodyValue = new LocalizableString(this, true);
+        this.locBodyValue.onRenderedHtmlCallback = function(text) { return self.processedBody; };
         this.locCompletedHtmlValue = new LocalizableString(this);
         this.locPagePrevTextValue = new LocalizableString(this);
         this.locPageNextTextValue = new LocalizableString(this);
         this.locCompleteTextValue = new LocalizableString(this);
         this.locQuestionTitleTemplateValue = new LocalizableString(this, true);
-
+        this.locQuestionBodyTemplateValue = new LocalizableString(this, true);
         this.textPreProcessor = new TextPreProcessor();
         this.textPreProcessor.onHasValue = function (name: string) { return self.hasProcessedTextValue(name); };
         this.textPreProcessor.onProcess = function (name: string) { return self.getProcessedTextValue(name); };
@@ -315,6 +324,9 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public get title(): string { return this.locTitle.text; }
     public set title(value: string) { this.locTitle.text = value; }
     get locTitle(): LocalizableString { return this.locTitleValue; }
+    public get body(): string { return this.locBody.text; }
+    public set body(value: string) { this.locBody.text = value; }
+    public get locBody(): LocalizableString { return this.locBodyValue; }
     /**
      * The html that shows on completed ('Thank you') page. Set it to change the default text.
      * @see showCompletedPage
@@ -357,6 +369,10 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      */
     public getQuestionTitleTemplate(): string { return this.locQuestionTitleTemplate.textOrHtml; }
     get locQuestionTitleTemplate(): LocalizableString { return this.locQuestionTitleTemplateValue; }
+    public get questionBodyTemplate(): string { return this.locQuestionBodyTemplate.text;}
+    public set questionBodyTemplate(value: string) { this.locQuestionBodyTemplate.text = value;}
+    public getQuestionBodyTemplate(): string { return this.locQuestionBodyTemplate.textOrHtml; }
+    public get locQuestionBodyTemplate(): LocalizableString { return this.locQuestionBodyTemplateValue; }
 
     /**
      * Set this property to false to turn off the numbering on pages titles.
@@ -398,8 +414,14 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         if (value === this.questionTitleLocationValue) return;
         this.questionTitleLocationValue = value;
     };
+    public get processedBody() { return this.processText(this.locBody.textOrHtml); }
+    public get questionBodyLocation(): string { return this.questionBodyLocationValue; };
+    public set questionBodyLocation(value: string) {
+        if (value === this.questionBodyLocationValue) return;
+        this.questionBodyLocationValue = value;
+    };
     /**
-     * Set this mode to 'display' to make the survey read-only. 
+     * Set this mode to 'display' to make the survey read-only.
      */
     public get mode(): string { return this.modeValue; }
     public set mode(value: string) {
@@ -615,7 +637,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public get isDisplayMode(): boolean { return this.mode == "display"; }
     /**
      * Returns true if the survey in the design mode. It is used by SurveyJS Editor
-     * @see setDesignMode 
+     * @see setDesignMode
      */
     public get isDesignMode(): boolean { return this.isDesignModeValue; }
     /**
@@ -629,7 +651,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      * Returns true, if a user has already completed the survey on this browser and there is a cookie about it. Survey goes to 'completed' state if the function returns true.
      * @see cookieName
      * @see setCookie
-     * @see deleteCookie  
+     * @see deleteCookie
      * @see state
      */
     public get hasCookie(): boolean {
@@ -641,17 +663,17 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      * Set the cookie with cookieName in the browser. It is done automatically on survey complete if cookieName is not empty.
      * @see cookieName
      * @see hasCookie
-     * @see deleteCookie  
+     * @see deleteCookie
      */
     public setCookie() {
         if (!this.cookieName) return;
         document.cookie = this.cookieName + "=true; expires=Fri, 31 Dec 9999 0:0:0 GMT";
     }
     /**
-     * Delete the cookie with cookieName in the browser. 
+     * Delete the cookie with cookieName in the browser.
      * @see cookieName
      * @see hasCookie
-     * @see setCookie  
+     * @see setCookie
      */
     public deleteCookie() {
         if (!this.cookieName) return;
@@ -1230,6 +1252,8 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
 
 JsonObject.metaData.addClass("survey", [{ name: "locale", choices: () => { return surveyLocalization.getLocales() } },
     {name: "title", serializationProperty: "locTitle"}, { name: "focusFirstQuestionAutomatic:boolean", default: true},
+    {name: "title", serializationProperty: "locTitle"}, {name: "body", serializationProperty: "locBody"},
+    { name: "focusFirstQuestionAutomatic:boolean", default: true},
     {name: "completedHtml:html", serializationProperty: "locCompletedHtml"}, { name: "pages", className: "page", visible: false },
     { name: "questions", baseClassName: "question", visible: false, onGetValue: function (obj) { return null; }, onSetValue: function (obj, value, jsonConverter) { var page = obj.addNewPage(""); jsonConverter.toObject({ questions: value }, page); } },
     { name: "triggers:triggers", baseClassName: "surveytrigger", classNamePart: "trigger" },
@@ -1238,6 +1262,7 @@ JsonObject.metaData.addClass("survey", [{ name: "locale", choices: () => { retur
     { name: "showPageTitles:boolean", default: true }, { name: "showCompletedPage:boolean", default: true },
     "showPageNumbers:boolean", { name: "showQuestionNumbers", default: "on", choices: ["on", "onPage", "off"] },
     { name: "questionTitleLocation", default: "top", choices: ["top", "bottom"] },
+    { name: "questionBodyLocation", default: "top", choices: ["top", "bottom"] },
     { name: "showProgressBar", default: "off", choices: ["off", "top", "bottom"] },
     { name: "mode", default: "edit", choices: ["edit", "display"] },
     { name: "storeOthersAsComment:boolean", default: true }, "goNextPageAutomatic:boolean", "clearInvisibleValues:boolean",
