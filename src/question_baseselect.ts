@@ -63,7 +63,7 @@ export class QuestionSelectBase extends Question {
         }
     }
     protected setNewValue(newValue: any) {
-        if (newValue) this.cachedValueForUrlRequestion = newValue;        
+        if (newValue) this.cachedValueForUrlRequestion = newValue;
         super.setNewValue(newValue);
     }
     protected valueFromData(val: any): any {
@@ -106,20 +106,21 @@ export class QuestionSelectBase extends Question {
     }
     get choicesOrder(): string { return this.choicesOrderValue; }
     set choicesOrder(newValue: string) {
+        newValue = newValue.toLowerCase();
         if (newValue == this.choicesOrderValue) return;
         this.choicesOrderValue = newValue;
         this.onVisibleChoicesChanged();
     }
     public get otherText(): string { return this.locOtherText.text; }
-    public set otherText(value: string) { 
-        this.locOtherText.text = value; 
+    public set otherText(value: string) {
+        this.locOtherText.text = value;
         this.onVisibleChoicesChanged();
     }
     public get otherErrorText(): string { return this.locOtherErrorText.text; }
     public set otherErrorText(value: string) { this.locOtherErrorText.text = value;  }
-    public get locOtherText(): LocalizableString { return this.locOtherTextValue; } 
-    public get locOtherErrorText(): LocalizableString { return this.locOtherErrorTextValue; } 
-    
+    public get locOtherText(): LocalizableString { return this.locOtherTextValue; }
+    public get locOtherErrorText(): LocalizableString { return this.locOtherErrorTextValue; }
+
     get visibleChoices(): Array<ItemValue> {
         if (!this.hasOther && this.choicesOrder == "none") return this.activeChoices;
         if(!this.visibleChoicesCache) {

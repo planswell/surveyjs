@@ -23,7 +23,7 @@ export interface IMatrixDropdownData {
 }
 
 export interface IMatrixColumnOwner extends ILocalizableOwner {
-    getRequiredText(): string;    
+    getRequiredText(): string;
 }
 
 export class MatrixDropdownColumn extends Base implements ILocalizableOwner {
@@ -35,9 +35,9 @@ export class MatrixDropdownColumn extends Base implements ILocalizableOwner {
     public isRequired: boolean = false;
     public hasOther: boolean = false;
     public minWidth: string = "";
-    public cellType: string = "default";
-    public inputType: string = "text";
-    public choicesOrder: string = "none";
+    private cellTypeValue: string = "default";
+    private inputTypeValue: string = "text";
+    private choicesOrderValue: string = "none";
     public choicesByUrl: ChoicesRestfull;
     public colOwner: IMatrixColumnOwner = null;
     public validators: Array<SurveyValidator> = new Array<SurveyValidator>();
@@ -54,7 +54,19 @@ export class MatrixDropdownColumn extends Base implements ILocalizableOwner {
         if(title) this.title = title;
     }
     public getType() { return "matrixdropdowncolumn" }
-    
+
+    public get choicesOrder(): string { return this.choicesOrderValue; }
+    public set choicesOrder(newValue: string) {
+      this.choicesOrderValue = newValue.toLowerCase();
+    }
+    public get inputType(): string { return this.inputTypeValue; }
+    public set inputType(newValue: string) {
+      this.inputTypeValue = newValue.toLowerCase();
+    }
+    public get cellType(): string { return this.cellTypeValue; }
+    public set cellType(newValue: string) {
+        this.cellTypeValue = newValue.toLowerCase();
+    }
     public get title(): string { return this.locTitle.text ? this.locTitle.text : this.name; }
     public set title(value: string) { this.locTitle.text = value; }
     public get fullTitle(): string { return this.getFullTitle(this.locTitle.textOrHtml); }
@@ -240,6 +252,7 @@ export class QuestionMatrixDropdownModelBase extends Question implements IMatrix
     }
     public get cellType(): string { return this.cellTypeValue; }
     public set cellType(newValue: string) {
+        newValue = newValue.toLowerCase();
         if (this.cellType == newValue) return;
         this.cellTypeValue = newValue;
         this.fireCallback(this.updateCellsCallback);
@@ -456,7 +469,7 @@ JsonObject.metaData.addClass("matrixdropdowncolumn", ["name", { name: "title", s
         { name: "choicesByUrl:restfull", className: "ChoicesRestfull", onGetValue: function (obj: any) { return obj.choicesByUrl.isEmpty ? null : obj.choicesByUrl; }, onSetValue: function (obj: any, value: any) { obj.choicesByUrl.setData(value); } },
         { name: "inputType", default: "text", choices: ["color", "date", "datetime", "datetime-local", "email", "month", "number", "password", "range", "tel", "text", "time", "url", "week"] },
         { name: "validators:validators", baseClassName: "surveyvalidator", classNamePart: "validator" }],
-        
+
     function () { return new MatrixDropdownColumn(""); });
 
 JsonObject.metaData.addClass("matrixdropdownbase", [{ name: "columns:matrixdropdowncolumns", className: "matrixdropdowncolumn"},

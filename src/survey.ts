@@ -27,7 +27,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public showCompletedPage: boolean = true;
     public requiredText: string = "*";
     public questionStartIndex: string = "";
-    public showProgressBar: string = "off";
+    private showProgressBarValue: string = "off";
     public storeOthersAsComment: boolean = true;
     public goNextPageAutomatic: boolean = false;
     public pages: Array<PageModel> = new Array<PageModel>();
@@ -92,7 +92,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         this.locPageNextTextValue = new LocalizableString(this);
         this.locCompleteTextValue = new LocalizableString(this);
         this.locQuestionTitleTemplateValue = new LocalizableString(this, true);
-        
+
         this.textPreProcessor = new TextPreProcessor();
         this.textPreProcessor.onHasValue = function (name: string) { return self.hasProcessedTextValue(name); };
         this.textPreProcessor.onProcess = function (name: string) { return self.getProcessedTextValue(name); };
@@ -125,10 +125,10 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     //ILocalizableOwner
     public getLocale() { return this.locale; }
-    public getMarkdownHtml(text: string)  { 
+    public getMarkdownHtml(text: string)  {
         var options = {text: text, html: null}
         this.onTextMarkdown.fire(this, options);
-        return options.html; 
+        return options.html;
     }
     public getLocString(str: string) { return surveyLocalization.getString(str); }
 
@@ -161,18 +161,26 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     public get showQuestionNumbers(): string { return this.showQuestionNumbersValue; };
     public set showQuestionNumbers(value: string) {
+        value = value.toLowerCase();
+        value = (value === "onpage") ? "onPage" : value;
         if (value === this.showQuestionNumbers) return;
         this.showQuestionNumbersValue = value;
         this.updateVisibleIndexes();
     };
+    public get showProgressBar(): string { return this.showProgressBarValue}
+    public set showProgressBar(newValue: string) {
+      this.showProgressBarValue = newValue.toLowerCase();
+    }
     public get processedTitle() { return this.processText(this.locTitle.textOrHtml); }
     public get questionTitleLocation(): string { return this.questionTitleLocationValue; };
     public set questionTitleLocation(value: string) {
+        value = value.toLowerCase();
         if (value === this.questionTitleLocationValue) return;
         this.questionTitleLocationValue = value;
     };
     public get mode(): string { return this.modeValue; }
     public set mode(value: string) {
+        value = value.toLowerCase();
         if (value == this.mode) return;
         if (value != "edit" && value != "display") return;
         this.modeValue = value;
@@ -352,7 +360,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         this.doComplete();
         return true;
     }
-    public get isFirstPage(): boolean { 
+    public get isFirstPage(): boolean {
         if (this.currentPage == null) return true;
         return this.visiblePages.indexOf(this.currentPage) == 0;
     }
@@ -894,12 +902,12 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
 //Make localizable: completedHtml, pagePrevText, pageNextText, completeText
 
 JsonObject.metaData.addClass("survey", [{ name: "locale", choices: () => { return surveyLocalization.getLocales() } },
-    {name: "title", serializationProperty: "locTitle"}, { name: "focusFirstQuestionAutomatic:boolean", default: true}, 
+    {name: "title", serializationProperty: "locTitle"}, { name: "focusFirstQuestionAutomatic:boolean", default: true},
     {name: "completedHtml:html", serializationProperty: "locCompletedHtml"}, { name: "pages", className: "page", visible: false },
     { name: "questions", baseClassName: "question", visible: false, onGetValue: function (obj) { return null; }, onSetValue: function (obj, value, jsonConverter) { var page = obj.addNewPage(""); jsonConverter.toObject({ questions: value }, page); } },
     { name: "triggers:triggers", baseClassName: "surveytrigger", classNamePart: "trigger" },
     "surveyId", "surveyPostId", "cookieName", "sendResultOnPageNext:boolean",
-    { name: "showNavigationButtons:boolean", default: true }, { name: "showTitle:boolean", default: true }, 
+    { name: "showNavigationButtons:boolean", default: true }, { name: "showTitle:boolean", default: true },
     { name: "showPageTitles:boolean", default: true }, { name: "showCompletedPage:boolean", default: true },
     "showPageNumbers:boolean", { name: "showQuestionNumbers", default: "on", choices: ["on", "onPage", "off"] },
     { name: "questionTitleLocation", default: "top", choices: ["top", "bottom"] },
