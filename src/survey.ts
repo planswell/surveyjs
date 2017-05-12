@@ -109,6 +109,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      * @see oncComplete
      */
     public clearInvisibleValues: boolean = false;
+    public allowInvalid: boolean = false;
 
     private locTitleValue : LocalizableString;
     private locCompletedHtmlValue : LocalizableString;
@@ -690,7 +691,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      */
     public nextPage(): boolean {
         if (this.isLastPage) return false;
-        if (this.isEditMode && this.isCurrentPageHasErrors) return false;
+        if (this.isEditMode && this.isCurrentPageHasErrors && !this.allowInvalid) return false;
         if (this.doServerValidation()) return false;
         this.doNextPage();
         return true;
@@ -719,7 +720,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      * @see nextPage
      */
     public completeLastPage() : boolean {
-        if (this.isEditMode && this.isCurrentPageHasErrors) return false;
+        if (this.isEditMode && this.isCurrentPageHasErrors && !this.allowInvalid) return false;
         if (this.doServerValidation()) return false;
         this.doComplete();
         return true;
@@ -1440,7 +1441,8 @@ JsonObject.metaData.addClass("survey", [{ name: "locale", choices: () => { retur
     { name: "questionTitleLocation", default: "top", choices: ["top", "bottom"] },
     { name: "showProgressBar", default: "off", choices: ["off", "top", "bottom"] },
     { name: "mode", default: "edit", choices: ["edit", "display"] },
-    { name: "storeOthersAsComment:boolean", default: true }, "goNextPageAutomatic:boolean", "clearInvisibleValues:boolean",
+    { name: "storeOthersAsComment:boolean", default: true },
+    "goNextPageAutomatic:boolean", "clearInvisibleValues:boolean", "allowInvalid:boolean",
     { name: "pagePrevText", serializationProperty: "locPagePrevText"},
     { name: "pageNextText", serializationProperty: "locPageNextText"},
     { name: "completeText", serializationProperty: "locCompleteText"},
