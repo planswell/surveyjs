@@ -12,6 +12,7 @@ import {ILocalizableOwner, LocalizableString} from "./localizablestring";
  */
 export class Question extends QuestionBase implements IValidatorOwner {
     private locTitleValue: LocalizableString;
+    private locBodyValue : LocalizableString;
     private locCommentTextValue: LocalizableString;
     private questionValue: any;
     private questionComment: string;
@@ -30,11 +31,14 @@ export class Question extends QuestionBase implements IValidatorOwner {
     constructor(public name: string) {
         super(name);
         this.locTitleValue = new LocalizableString(this, true);
+        this.locBodyValue = new LocalizableString(this, true);
         var self = this;
+        this.locBodyValue.onRenderedHtmlCallback = function(text) { return self.processedBody; };
         this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.fullTitle; };
         this.locCommentTextValue = new LocalizableString(this, true);
     }
     public get hasTitle(): boolean { return true; }
+    public get hasBody(): boolean { return true; }
     public get hasInput(): boolean { return true; }
     public get inputId(): string { return this.id + "i"; }
     public get title(): string {
@@ -45,7 +49,22 @@ export class Question extends QuestionBase implements IValidatorOwner {
         this.locTitle.text = newValue;
         this.fireCallback(this.titleChangedCallback);
     }
-    public get locTitle(): LocalizableString { return this.locTitleValue; }
+    public get body(): string {
+        var res = this.locBody.text;
+        return res ? res : this.name;
+    }
+    public set body(newValue: string) {
+        this.locBody.text = newValue;
+        // this.fireCallback(this.titleChangedCallback);
+    }
+    public get locBody(): LocalizableString {
+      console.log("locBodyValue", this.locBodyValue);
+      return this.locBodyValue;
+    }
+    public get locTitle(): LocalizableString {
+      console.log("locTitleValue", this.locTitleValue);
+      return this.locTitleValue;
+    }
     public get locCommentText(): LocalizableString { return this.locCommentTextValue; }
     private get locTitleHtml(): string {
         var res = this.locTitle.textOrHtml;
@@ -55,6 +74,15 @@ export class Question extends QuestionBase implements IValidatorOwner {
         super.onLocaleChanged();
         this.locTitle.onChanged();
         this.locCommentText.onChanged();
+    }
+    public get processedBody() {
+      console.log("processedBody() A", this.survey != null);
+      return this.survey != null ? this.survey.processText(this.locBodyHtml) : this.locBodyHtml; }
+    private get locBodyHtml(): string {
+        var res = this.locBody.textOrHtml;
+        console.log("locBodyHtml() locBody", this.locBody);
+        console.log("locBodyHtml()", res);
+        return res? res: this.name;
     }
     public get processedTitle() { return this.survey != null ? this.survey.processText(this.locTitleHtml) : this.locTitleHtml; }
     public get fullTitle(): string {
@@ -253,6 +281,12 @@ export class Question extends QuestionBase implements IValidatorOwner {
     //IValidatorOwner
     getValidatorTitle(): string { return null; }
 }
-JsonObject.metaData.addClass("question", [{ name: "title:text", serializationProperty: "locTitle" },
+JsonObject.metaData.addClass(
+  "question",
+  [
+    { name: "title:text", serializationProperty: "locTitle" },
+    { name: "body:text", serializationProperty: "locBody" },
     { name: "commentText", serializationProperty: "locCommentText" },
-    "isRequired:boolean", "readOnly:boolean", { name: "validators:validators", baseClassName: "surveyvalidator", classNamePart: "validator"}], null, "questionbase");
+    "isRequired:boolean", "readOnly:boolean",
+    { name: "validators:validators", baseClassName: "surveyvalidator", classNamePart: "validator"}
+  ], null, "questionbase");

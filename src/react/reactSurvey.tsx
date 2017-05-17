@@ -80,7 +80,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
     }
     protected renderBody(): JSX.Element {
         var body = SurveyElementBase.renderLocString(this.survey.locBody);
-        return <div className={this.css.header}><h3>{body}</h3></div>;
+        return <div className={this.css.header}><p>{body}</p></div>;
     }
     protected renderPage(): JSX.Element {
         return <SurveyPage survey={this.survey} page={this.survey.currentPage} css={this.css} creator={this} />;
@@ -205,4 +205,5 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
         return <div key={key} className={this.css.error.item}>{errorText}</div>;
     }
     public questionTitleLocation(): string { return this.survey.questionTitleLocation; }
+    public questionBodyLocation(): string { return this.survey.questionBodyLocation; }
 }

@@ -80,6 +80,7 @@ export class SurveyPanel extends React.Component<any, any> {
     render(): JSX.Element {
         if (this.panel == null || this.survey == null || this.creator == null) return null;
         var title = this.renderTitle();
+        var body = this.renderBody();
         var rows = [];
         var questionRows = this.panel.rows;
         for (var i = 0; i < questionRows.length; i++) {
@@ -103,6 +104,11 @@ export class SurveyPanel extends React.Component<any, any> {
         if (!this.panel.title) return null;
         var text = SurveyElementBase.renderLocString(this.panel.locTitle);
         return (<h4 className={this.css.pageTitle}>{text}</h4>);
+    }
+    protected renderBody(): JSX.Element {
+        if (!this.panel.body) return null;
+        var text = SurveyElementBase.renderLocString(this.panel.locBody);
+        return (<h6 className={this.css.pageBody}>{text}</h6>);
     }
 }
 

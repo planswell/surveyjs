@@ -87,10 +87,12 @@ export class SurveyQuestion extends React.Component<any, any> {
         return (
             <div ref="root" id={this.questionBase.id} className={this.css.question.root} style={rootStyle}>
                 {titleTop}
+                {bodyTop}
                 {errors}
                 {questionRender}
                 {comment}
                 {titleBottom}
+                {bodyBottom}
             </div>
         );
     }
@@ -104,6 +106,10 @@ export class SurveyQuestion extends React.Component<any, any> {
     protected renderTitle(): JSX.Element {
         var titleText = SurveyElementBase.renderLocString(this.question.locTitle);
         return (<h5 className={this.css.question.title}>{titleText}</h5>);
+    }
+    protected renderBody(): JSX.Element {
+        var bodyText = SurveyElementBase.renderLocString(this.question.locBody);
+        return (<p className={this.css.question.body}>{bodyText}</p>);
     }
     protected renderComment(): JSX.Element {
         var commentText = SurveyElementBase.renderLocString(this.question.locCommentText);
