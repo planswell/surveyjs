@@ -33,6 +33,7 @@ export interface ISurvey extends ITextProcessor {
     questionTitleLocation: string;
     questionErrorLocation: string;
     getQuestionTitleTemplate(): string;
+    getQuestionBodyTemplate(): string;
     storeOthersAsComment: boolean;
     uploadFile(name: string, file: File, storeDataAsText: boolean, uploadingCallback: (status: string) => any): boolean;
     updateQuestionCssClasses(question: IQuestion, cssClasses: any);
@@ -74,6 +75,7 @@ export interface IElement  extends IConditionRunner, ISurveyElement{
 
 export interface IQuestion extends IElement {
     hasTitle: boolean;
+    hasBody: boolean;
     setVisibleIndex(value: number): number;
     onSurveyValueChanged(newValue: any);
     onReadOnlyChanged();
