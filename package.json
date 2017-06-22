@@ -51,6 +51,7 @@
     "karma-webpack": "2.0.2",
     "knockout": "3.4.0",
     "live-server": "1.2.0",
+    "moment": "^2.18.1",
     "node-sass": "4.4.0",
     "node-uuid": "1.4.7",
     "phantomjs-prebuilt": "2.1.14",
@@ -58,6 +59,7 @@
     "preact-compat": "3.13.1",
     "qunitjs": "2.2.0",
     "react": "15.0.1",
+    "react-datepicker": "^0.48.0",
     "react-dom": "15.0.1",
     "rimraf": "2.5.4",
     "sass-loader": "4.1.1",
@@ -75,8 +77,5 @@
     "vue-property-decorator": "4.0.0",
     "vue-template-compiler": "2.1.10",
     "webpack": "2.2.1"
-  },
-  "dependencies": {
-    "react-datepicker": "^0.48.0"
   }
 }
