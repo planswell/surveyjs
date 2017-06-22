@@ -15,7 +15,7 @@ export default class SurveyQuestionDate extends React.Component<any, any> {
         this.handleOnChange = this.handleOnChange.bind(this);
     }
     handleOnChange(date) {
-        this.question.value = date.format("MM/DD/YYYY");
+        this.question.value = date.format("DD/MM/YYYY");
         this.setState({ value: this.question.value });
     }
     componentWillReceiveProps(nextProps: any) {
@@ -24,7 +24,7 @@ export default class SurveyQuestionDate extends React.Component<any, any> {
     }
     render(): JSX.Element {
         if (!this.question) return null;
-        var date = this.question.value ? moment(this.question.value) : moment();
+        var date = this.question.value ? moment(this.question.value, "DD/MM/YYYY") : moment();
         return (
             <div id={this.getDivId()}>
                 <DatePicker className="form-control" showYearDropdown selected={date} onChange={this.handleOnChange} />
