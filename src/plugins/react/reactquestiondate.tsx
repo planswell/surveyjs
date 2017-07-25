@@ -1,7 +1,7 @@
 ﻿import * as React from 'react';
 import QuestionDateModel from "../question_date";
 import {ReactQuestionFactory} from "../../react/reactquestionfactory";
-import DatePicker from 'react-datepicker';
+import Cleave from 'cleave.js/react';
 import moment from 'moment';
 
 export default class SurveyQuestionDate extends React.Component<any, any> {
@@ -14,8 +14,8 @@ export default class SurveyQuestionDate extends React.Component<any, any> {
         this.state = { value: this.question.value };
         this.handleOnChange = this.handleOnChange.bind(this);
     }
-    handleOnChange(date) {
-        this.question.value = date.format("DD/MM/YYYY");
+    handleOnChange(event) {
+        this.question.value = event.target.value;
         this.setState({ value: this.question.value });
     }
     componentWillReceiveProps(nextProps: any) {
@@ -24,10 +24,14 @@ export default class SurveyQuestionDate extends React.Component<any, any> {
     }
     render(): JSX.Element {
         if (!this.question) return null;
-        var date = this.question.value ? moment(this.question.value, "DD/MM/YYYY") : moment();
+        var value = this.question.value;
         return (
             <div id={this.getDivId()}>
-                <DatePicker className="form-control" showYearDropdown selected={date} onChange={this.handleOnChange} />
+                <Cleave placeholder="DD/MM/YYYY"
+                className="form-control"
+                value={value}
+                options={{date: true, datePattern: ['d', 'm', 'Y']}}
+                onChange={this.handleOnChange} />
             </div>
         );
     }
