@@ -57,4 +57,4 @@ export {surveyLocalization, surveyStrings} from "../../surveyStrings";
 export {QuestionCustomWidget, CustomWidgetCollection} from "../../questionCustomWidgets";
 
 //Uncomment to include the "date" question type.
-//export {default as QuestionDateModel} from "../../plugins/question_date";
+export {default as QuestionDateModel} from "../../plugins/question_date";

@@ -1,7 +1,8 @@
 ﻿import * as React from 'react';
 import QuestionDateModel from "../question_date";
 import {ReactQuestionFactory} from "../../react/reactquestionfactory";
-
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
 
 export default class SurveyQuestionDate extends React.Component<any, any> {
     private question: QuestionDateModel;
@@ -13,28 +14,20 @@ export default class SurveyQuestionDate extends React.Component<any, any> {
         this.state = { value: this.question.value };
         this.handleOnChange = this.handleOnChange.bind(this);
     }
-    handleOnChange(event) {
-        this.question.value = event.target.value;
+    handleOnChange(date) {
+        this.question.value = date.format("DD/MM/YYYY");
         this.setState({ value: this.question.value });
     }
     componentWillReceiveProps(nextProps: any) {
         this.question = nextProps.question;
         this.css = nextProps.css;
     }
-    componentDidMount() {
-        var funcText = this.question.getjQueryScript(this.getDateId());
-        var scriptText = "$(function () { " + funcText + " });";
-        var rootId = this.getDivId();
-        var scriptEl = document.createElement("script");
-        scriptEl.type = "text\/javascript";
-        scriptEl.text = scriptText;
-        document.getElementById(rootId).appendChild(scriptEl);
-    }
     render(): JSX.Element {
         if (!this.question) return null;
+        var date = this.question.value ? moment(this.question.value, "DD/MM/YYYY") : moment();
         return (
             <div id={this.getDivId()}>
-                <input className={this.css} id={this.getDateId()} type="text" value={this.question.value || ''} onChange={this.handleOnChange} />
+                <DatePicker className="form-control" showYearDropdown selected={date} onChange={this.handleOnChange} />
             </div>
         );
     }

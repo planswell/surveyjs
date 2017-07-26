@@ -123,6 +123,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     private locPageNextTextValue : LocalizableString;
     private locCompleteTextValue : LocalizableString;
     private locQuestionTitleTemplateValue: LocalizableString;
+    private locQuestionBodyTemplateValue: LocalizableString;
 
     private currentPageValue: PageModel = null;
     private valuesHash: HashTable<any> = {};
@@ -397,6 +398,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         this.locPageNextTextValue = new LocalizableString(this);
         this.locCompleteTextValue = new LocalizableString(this);
         this.locQuestionTitleTemplateValue = new LocalizableString(this, true);
+        this.locQuestionBodyTemplateValue = new LocalizableString(this, true);
 
         this.textPreProcessor = new TextPreProcessor();
         this.textPreProcessor.onHasValue = function (name: string) { return self.hasProcessedTextValue(name); };
@@ -494,6 +496,19 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
      */
     public getQuestionTitleTemplate(): string { return this.locQuestionTitleTemplate.textOrHtml; }
     get locQuestionTitleTemplate(): LocalizableString { return this.locQuestionTitleTemplateValue; }
+    /**
+     * A template for a question body.
+     * @see QuestionModel.body
+     */
+    public get questionBodyTemplate(): string { return this.locQuestionBodyTemplate.text;}
+    public set questionBodyTemplate(value: string) { this.locQuestionBodyTemplate.text = value;}
+    /**
+     * Returns the question body template
+     * @see questionBodyTemplate
+     * @see QuestionModel.body
+     */
+    public getQuestionBodyTemplate(): string { return this.locQuestionBodyTemplate.textOrHtml; }
+    public get locQuestionBodyTemplate(): LocalizableString { return this.locQuestionBodyTemplateValue; }
 
     /**
      * Set this property to false to turn off the numbering on pages titles.

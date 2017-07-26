@@ -70,6 +70,9 @@ export class SurveyQuestion extends React.Component<any, any> {
         var title = this.questionBase.hasTitle ? this.renderTitle(cssClasses) : null;
         var titleTop = this.creator.questionTitleLocation() == "top" ? title : null;
         var titleBottom = this.creator.questionTitleLocation() == "bottom" ? title : null;
+        var body = this.questionBase.hasBody ? this.renderBody() : null;
+        var bodyTop = this.creator.questionTitleLocation() == "top" ? body : null;
+        var bodyBottom = this.creator.questionTitleLocation() == "bottom" ? body : null;
         var comment = (this.question && this.question.hasComment) ? this.renderComment(cssClasses) : null;
         var errors = this.renderErrors(cssClasses);
         var paddingLeft = (this.questionBase.indent > 0) ? this.questionBase.indent * cssClasses.indent + "px" : null;
@@ -81,10 +84,12 @@ export class SurveyQuestion extends React.Component<any, any> {
         return (
             <div ref="root" id={this.questionBase.id} className={cssClasses.mainRoot} style={rootStyle}>
                 {titleTop}
+                {bodyTop}
                 {errors}
                 {questionRender}
                 {comment}
                 {titleBottom}
+                {bodyBottom}
             </div>
         );
     }
@@ -98,6 +103,10 @@ export class SurveyQuestion extends React.Component<any, any> {
     protected renderTitle(cssClasses: any): JSX.Element {
         var titleText = SurveyElementBase.renderLocString(this.question.locTitle);
         return (<h5 className={cssClasses.title}>{titleText}</h5>);
+    }
+    protected renderBody(): JSX.Element {
+        var bodyText = SurveyElementBase.renderLocString(this.question.locBody);
+        return (<div>{bodyText}</div>);
     }
     protected renderComment(cssClasses: any): JSX.Element {
         var commentText = SurveyElementBase.renderLocString(this.question.locCommentText);
