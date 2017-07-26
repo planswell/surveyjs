@@ -13,6 +13,7 @@ import {ConditionRunner} from './conditions';
  */
 export class Question extends QuestionBase implements IValidatorOwner {
     private locTitleValue: LocalizableString;
+    private locBodyValue: LocalizableString;
     private locCommentTextValue: LocalizableString;
     private questionValue: any;
     private questionComment: string;
@@ -35,15 +36,19 @@ export class Question extends QuestionBase implements IValidatorOwner {
      * @see isReadOnly
      */
     public enableIf: string = "";
+    bodyChangedCallback: () => void;
 
     constructor(public name: string) {
         super(name);
         this.locTitleValue = new LocalizableString(this, true);
+        this.locBodyValue = new LocalizableString(this, true);
         var self = this;
         this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.fullTitle; };
+        this.locBodyValue.onRenderedHtmlCallback = function(text) { return self.body; };
         this.locCommentTextValue = new LocalizableString(this, true);
     }
     public get hasTitle(): boolean { return true; }
+    public get hasBody(): boolean { return !!this.locBodyValue.textOrHtml; }
     public get hasInput(): boolean { return true; }
     public get inputId(): string { return this.id + "i"; }
     /** 
@@ -59,6 +64,15 @@ export class Question extends QuestionBase implements IValidatorOwner {
         this.fireCallback(this.titleChangedCallback);
     }
     get locTitle(): LocalizableString { return this.locTitleValue; }
+    public get body(): string {
+        var res = this.locBody.textOrHtml;
+        return res ? res : null;
+    }
+    public set body(newValue: string) {
+        this.locBody.text = newValue;
+        this.fireCallback(this.bodyChangedCallback);
+    }
+    get locBody(): LocalizableString { return this.locBodyValue; }
     get locCommentText(): LocalizableString { return this.locCommentTextValue; }
     private get locTitleHtml(): string {
         var res = this.locTitle.textOrHtml;
@@ -352,5 +366,6 @@ export class Question extends QuestionBase implements IValidatorOwner {
     getValidatorTitle(): string { return null; }
 }
 JsonObject.metaData.addClass("question", [{ name: "title:text", serializationProperty: "locTitle" },
+    { name: "body", serializationProperty: "locBody" },
     { name: "commentText", serializationProperty: "locCommentText" }, "enableIf:expression",
     "isRequired:boolean", "readOnly:boolean", { name: "validators:validators", baseClassName: "surveyvalidator", classNamePart: "validator"}], null, "questionbase");

@@ -41,4 +41,4 @@ export {ReactQuestionFactory} from "../react/reactquestionfactory"; // TODO need
 export {ReactQuestionFactory as QuestionFactory} from "../react/reactquestionfactory";
 
 //Uncomment to include the "date" question type.
-//export {default as SurveyQuestionDate} from "../plugins/react/reactquestiondate";
+export {default as SurveyQuestionDate} from "../plugins/react/reactquestiondate";
