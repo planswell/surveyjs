@@ -313,6 +313,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyData, ISurveyIm
         this.createLocalizableString("pageNext", this);
         this.createLocalizableString("complete", this);
         this.createLocalizableString("questionTitleTemplate", this, true);
+        this.createLocalizableString("questionBodyTemplate", this, true);
 
         this.textPreProcessor = new TextPreProcessor();
         this.textPreProcessor.onHasValue = function (name: string) { return self.hasProcessedTextValue(name); };
@@ -541,6 +542,19 @@ export class SurveyModel extends Base implements ISurvey, ISurveyData, ISurveyIm
      */
     public getQuestionTitleTemplate(): string { return this.locQuestionTitleTemplate.textOrHtml; }
     get locQuestionTitleTemplate(): LocalizableString { return this.getLocalizableString("questionTitleTemplate"); }
+    /**
+     * A template for a question body.
+     * @see QuestionModel.body
+     */
+    public get questionBodyTemplate(): string { return this.getLocalizableStringText("questionBodyTemplate");}
+    public set questionBodyTemplate(value: string) { this.setLocalizableStringText("questionBodyTemplate", value);}
+    /**
+     * Returns the question body template
+     * @see questionBodyTemplate
+     * @see QuestionModel.body
+     */
+    public getQuestionBodyTemplate(): string { return this.locQuestionBodyTemplate.textOrHtml; }
+    public get locQuestionBodyTemplate(): LocalizableString { return this.getLocalizableString("questionBodyTemplate"); }
 
     /**
      * Set this property to false to turn off the numbering on pages titles.
@@ -1721,4 +1735,4 @@ JsonObject.metaData.addClass("survey", [{ name: "locale", choices: () => { retur
     { name: "pagePrevText", serializationProperty: "locPagePrevText"},
     { name: "pageNextText", serializationProperty: "locPageNextText"},
     { name: "completeText", serializationProperty: "locCompleteText"},
-    { name: "requiredText", default: "*" }, "questionStartIndex", {name: "questionTitleTemplate", serializationProperty: "locQuestionTitleTemplate"}]);
+    { name: "requiredText", default: "*" }, "questionStartIndex", {name: "questionTitleTemplate", serializationProperty: "locQuestionTitleTemplate"}, {name: "questionBodyTemplate", serializationProperty: "locQuestionBodyTemplate"}]);

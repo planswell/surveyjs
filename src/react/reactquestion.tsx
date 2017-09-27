@@ -74,6 +74,9 @@ export class SurveyQuestion extends React.Component<any, any> {
         var titleBottom = this.creator.questionTitleLocation() == "bottom" ? title : null;
         var descriptionTop = this.creator.questionTitleLocation() == "top" ? description : null;
         var descriptionBottom = this.creator.questionTitleLocation() == "bottom" ? description : null;
+        var body = this.questionBase.hasBody ? this.renderBody() : null;
+        var bodyTop = this.creator.questionTitleLocation() == "top" ? body : null;
+        var bodyBottom = this.creator.questionTitleLocation() == "bottom" ? body : null;
         var comment = (this.question && this.question.hasComment) ? this.renderComment(cssClasses) : null;
         var errors = this.renderErrors(cssClasses);
         var errorsTop = this.creator.questionErrorLocation() == "top" ? errors : null;
@@ -89,11 +92,13 @@ export class SurveyQuestion extends React.Component<any, any> {
                 {titleTop}
                 {descriptionTop}
                 {errorsTop}
+                {bodyTop}
                 {questionRender}
                 {comment}
                 {errorsBottom}
                 {titleBottom}
                 {descriptionBottom}
+                {bodyBottom}
             </div>
         );
     }
@@ -112,6 +117,10 @@ export class SurveyQuestion extends React.Component<any, any> {
         if(!this.questionBase.hasDescription) return null;
         var descriptionText = SurveyElementBase.renderLocString(this.question.locDescription);
         return <div className={cssClasses.description}>{descriptionText}</div>;
+    }
+    protected renderBody(): JSX.Element {
+        var bodyText = SurveyElementBase.renderLocString(this.question.locBody);
+        return (<div>{bodyText}</div>);
     }
     protected renderComment(cssClasses: any): JSX.Element {
         var commentText = SurveyElementBase.renderLocString(this.question.locCommentText);

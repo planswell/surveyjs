@@ -29,12 +29,15 @@ export class Question extends QuestionBase implements IValidatorOwner {
      * @see isReadOnly
      */
     public enableIf: string = "";
+    bodyChangedCallback: () => void;
 
     constructor(public name: string) {
         super(name);
         var self = this;
         var locTitleValue = this.createLocalizableString("title", this, true);
+        var locBodyValue = this.createLocalizableString("body", this, true);
         locTitleValue.onRenderedHtmlCallback = function(text) { return self.fullTitle; };
+        locBodyValue.onRenderedHtmlCallback = function(text) { return self.fullBody; };
         var locDescriptionValue = this.createLocalizableString("description", this, true);
         locDescriptionValue.onRenderedHtmlCallback = function(html) { return self.getProcessedHtml(html); }
         this.createLocalizableString("commentText", this, true);
@@ -42,6 +45,7 @@ export class Question extends QuestionBase implements IValidatorOwner {
     }
     public getType(): string { return "question"; }
     public get hasTitle(): boolean { return true; }
+    public get hasBody(): boolean { return !!this.locBody.textOrHtml; }
     public get hasDescription(): boolean { return this.description != ""; }
     public get titleLocation() : string { return this.survey ? this.survey.questionTitleLocation : "top"; }
     public get errorLocation() : string { return this.survey ? this.survey.questionErrorLocation : "top"; }
@@ -59,6 +63,14 @@ export class Question extends QuestionBase implements IValidatorOwner {
         this.fireCallback(this.titleChangedCallback);
     }
     get locTitle(): LocalizableString { return this.getLocalizableString("title"); }
+    public get body(): string {
+        return this.getLocalizableStringText("body", null);
+    }
+    public set body(val: string) {
+        this.setLocalizableStringText("body", val);
+        this.fireCallback(this.bodyChangedCallback);
+    }
+    get locBody(): LocalizableString { return this.getLocalizableString("body"); }
     /**
      * Question description. It renders under question title by using smaller font. Unlike the title, description can be empty.
      * @see title
@@ -82,6 +94,10 @@ export class Question extends QuestionBase implements IValidatorOwner {
         var res = this.locTitle.textOrHtml;
         return res? res: this.name;
     }
+    private get locBodyHtml(): string {
+        var res = this.locBody.textOrHtml;
+        return res? res: null;
+    }
     /**
      * Returns a copy of question errors survey. For some questions like matrix and panel dynamic it includes the errors of nested questions.
      */
@@ -89,6 +105,7 @@ export class Question extends QuestionBase implements IValidatorOwner {
     public onLocaleChanged() {
         super.onLocaleChanged();
         this.locTitle.onChanged();
+        this.locBody.onChanged();
         this.locDescription.onChanged();
         this.locCommentText.onChanged();
     }
@@ -100,6 +117,10 @@ export class Question extends QuestionBase implements IValidatorOwner {
      * Returns the rendred question title.
      */
     public get processedTitle() { return this.getProcessedHtml(this.locTitleHtml); }
+    /**
+     * Returns the rendred question body.
+     */
+    public get processedBody() { return this.getProcessedHtml(this.locBodyHtml); }
     /**
      * Returns the title after processing the question template.
      * @see SurveyModel.questionTitleTemplate
@@ -119,6 +140,22 @@ export class Question extends QuestionBase implements IValidatorOwner {
         var no = this.no;
         if (no) no += ". ";
         return no + requireText + this.processedTitle;
+    }
+    /**
+     * Returns the title after processing the question template.
+     * @see SurveyModel.questionTitleTemplate
+     */
+    public get fullBody(): string {
+        if (this.survey && this.survey.getQuestionBodyTemplate()) {
+            if (!this.textPreProcessor) {
+                var self = this;
+                this.textPreProcessor = new TextPreProcessor();
+                this.textPreProcessor.onHasValue = function (body: string) { return self.canProcessedTextValues(body.toLowerCase()); };
+                this.textPreProcessor.onProcess = function (body: string) { return self.getProcessedTextValue(body); };
+            }
+            return this.textPreProcessor.process(this.survey.getQuestionBodyTemplate());
+        }
+        return this.processedBody;
     }
     public focus(onError: boolean = false) {
         SurveyElement.ScrollElementToTop(this.id);
@@ -408,6 +445,7 @@ export class Question extends QuestionBase implements IValidatorOwner {
 }
 JsonObject.metaData.addClass("question", [{ name: "title:text", serializationProperty: "locTitle" },
     { name: "description:text", serializationProperty: "locDescription" }, 
+    { name: "body:text", serializationProperty: "locBody" },
     { name: "commentText", serializationProperty: "locCommentText" }, "enableIf:expression", "defaultValue:value",
     "isRequired:boolean", { name: "requiredErrorText:text", serializationProperty: "locRequiredErrorText" },
     "readOnly:boolean", { name: "validators:validators", baseClassName: "surveyvalidator", classNamePart: "validator"}], null, "questionbase");

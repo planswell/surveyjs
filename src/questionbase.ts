@@ -100,6 +100,10 @@ export class QuestionBase extends SurveyElement implements IQuestion, ICondition
      */
     public get hasDescription(): boolean { return false; }
     /**
+     * Returns false if the question doesn't have a body,
+     */
+    public get hasBody(): boolean { return false; }
+    /**
      * Returns false if the question doesn't have an input element, for example: QuestionHtmlModel
      */
     public get hasInput(): boolean { return false; }
